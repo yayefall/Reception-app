@@ -94,22 +94,33 @@ function Consommation() {
       c.signature || "—",
     ]);
 
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 40,
-      theme: "grid",
-      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-      styles: { cellPadding: 3, fontSize: 10 },
-    });
+  
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 40,
+    theme: "grid",
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    styles: { cellPadding: 3, fontSize: 10 },
+    // Événement pour ajouter le numéro de page
+    didDrawPage: () => {
+      const pageSize = doc.internal.pageSize;
+      const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+      const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
 
-    const dateNow = new Date().toLocaleString();
-    doc.setFontSize(10);
-    doc.text(`Document généré le ${dateNow}`, 14, doc.internal.pageSize.height - 10);
+      const pageNumber = doc.internal.getNumberOfPages();
+      doc.setFontSize(10);
+      doc.text(`Page ${pageNumber}`, pageWidth - 20, pageHeight - 10, { align: "right" });
+    },
+  });
 
-    doc.save("consommations.pdf");
-  };
+  const dateNow = new Date().toLocaleString();
+  doc.setFontSize(10);
+  doc.text(`Document généré le ${dateNow}`, 14, doc.internal.pageSize.height - 10);
+
+  doc.save("consommations.pdf");
+};
 
   // --- Form handlers ---
   const handleChange = (e) => {
