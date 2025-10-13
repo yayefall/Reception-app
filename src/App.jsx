@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/** eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import Tabs from "./components/Tabs.jsx";
 import Visitors from "./components/Visitors.jsx";
@@ -20,7 +20,7 @@ function App() {
   const [currentTab, setCurrentTab] = useState("Dashboard");
   const tabs = ["Dashboard", "Visitors", "Appointments", "Calls", "Mail", "Tasks", "Consommation"];
 
-  // États pour modals
+  /**  États pour modals*/
   const [showUserListModal, setShowUserListModal] = useState(false);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [users, setUsers] = useState([]);

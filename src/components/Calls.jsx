@@ -230,6 +230,7 @@ function Calls() {
                   value={form.phone}
                   onChange={handleChange}
                   placeholder="Phone"
+                  required
                   className="mb-3"
                 />
               </Col>
@@ -241,6 +242,7 @@ function Calls() {
                   value={form.message}
                   onChange={handleChange}
                   placeholder="Message"
+                  required
                   className="mb-3"
                 />
               </Col>
@@ -250,6 +252,7 @@ function Calls() {
                   value={form.transferred_to}
                   onChange={handleChange}
                   placeholder="Transferred To"
+                  required
                   className="mb-3"
                 />
               </Col>
