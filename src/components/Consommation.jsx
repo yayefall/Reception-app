@@ -83,9 +83,11 @@ function Consommation() {
     doc.setFontSize(18);
     doc.text("Liste des consommations", 105, 20, { align: "center" });
 
-    const tableColumn = ["Date", "Objet", "Quantité", "Nom complet", "Signature"];
-    const tableRows = dataConsos.map((c) => [
-      new Date(c.date_consommation).toLocaleString(),
+    const tableColumn = ["N°", "Date", "Objet", "Quantité", "Nom complet", "Signature"];
+ // Ajouter l'index + 1 comme première colonne
+  const tableRows = dataConsos.map((c, index) => [
+     index + 1,
+     new Date(c.date_consommation).toLocaleString(),
       c.objet,
       c.quantite,
       c.nom_complet,

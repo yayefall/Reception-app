@@ -129,18 +129,19 @@ const totalPages = Math.ceil(filteredCleaners.length / itemsPerPage);
 
 // ---------------- EXPORT FUNCTIONS ----------------
 
-// ✅ Export Excel en excluant dynamiquement certaines colonnes
+// ✅ Export Excel avec numérotation et exclusion de certaines colonnes
 const exportToExcel = () => {
   const excludedColumns = ["id", "created_at"]; // colonnes à exclure
 
-  const dataToExport = cleaners.map(item => {
+  const dataToExport = cleaners.map((item, index) => {
     const filteredItem = {};
     Object.keys(item).forEach(key => {
       if (!excludedColumns.includes(key)) {
         filteredItem[key] = item[key];
       }
     });
-    return filteredItem;
+    // Ajouter la numérotation comme première colonne
+    return { "N°": index + 1, ...filteredItem };
   });
 
   const ws = XLSX.utils.json_to_sheet(dataToExport);
@@ -174,17 +175,14 @@ const exportToExcel = () => {
     }
   };
 
-  const generatePDF = (doc, dataConsos, logo) => {
+ const generatePDF = (doc, dataCleaners, logo) => {
   if (logo) doc.addImage(logo, "PNG", 10, 5, 30, 30);
 
   doc.setFontSize(18);
   doc.text("Liste des Cleaners", 105, 20, { align: "center" });
 
-  // Ajouter la colonne "N°" pour la numérotation
   const tableColumn = ["N°", "Nom complet", "Fonction", "Téléphone", "Lieu", "Localisation"];
-  
-  // Ajouter l'index + 1 comme première colonne
-  const tableRows = dataConsos.map((c, index) => [
+  const tableRows = dataCleaners.map((c, index) => [
     index + 1,
     c.nomComplet,
     c.fonction,
@@ -201,14 +199,25 @@ const exportToExcel = () => {
     headStyles: { fillColor: [41, 128, 185], textColor: 255 },
     alternateRowStyles: { fillColor: [245, 245, 245] },
     styles: { cellPadding: 3, fontSize: 10 },
+    // Événement pour ajouter le numéro de page
+    didDrawPage: () => {
+      const pageSize = doc.internal.pageSize;
+      const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+      const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
+
+      const pageNumber = doc.internal.getNumberOfPages();
+      doc.setFontSize(10);
+      doc.text(`Page ${pageNumber}`, pageWidth - 20, pageHeight - 10, { align: "right" });
+    },
   });
 
   const dateNow = new Date().toLocaleString();
   doc.setFontSize(10);
   doc.text(`Document généré le ${dateNow}`, 14, doc.internal.pageSize.height - 10);
 
-  doc.save("consommations.pdf");
+  doc.save("cleaners.pdf");
 };
+
 
 
 
