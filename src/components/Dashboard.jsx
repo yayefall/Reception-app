@@ -37,14 +37,15 @@ function Dashboard() {
   const [stats, setStats] = useState(null);
   const [dailyStats, setDailyStats] = useState([]);
   const token = localStorage.getItem("token");
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+ 
 
-    // ---------------- CLEANER STATES ----------------
+   {/* ===================== CLEANER STATE ===================== */}
   const [cleaners, setCleaners] = useState([]);
   const [showCleaner, setShowCleaner] = useState(false);
   const [showAddCleaner, setShowAddCleaner] = useState(false);
+   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);  
+  const itemsPerPage = 5;
   const [newCleaner, setNewCleaner] = useState({
     id: null,
     nomComplet: "",
@@ -53,21 +54,53 @@ function Dashboard() {
     lieu: "",
     localisation: "",
   });
-// filtrer selon la recherche
+  // ===================== PARTENAIRE STATE =====================
+const [partenaires, setPartenaires] = useState([]);
+const [showPartenaire, setShowPartenaire] = useState(false);
+const [showAddPartenaire, setShowAddPartenaire] = useState(false);
+const [searchPartenaire, setSearchPartenaire] = useState("");
+const [currentPagePartenaire, setCurrentPagePartenaire] = useState(1);
+const [newPartenaire, setNewPartenaire] = useState({
+  id: null,
+  nom_complet: "",
+  entreprise: "",
+  telephone: "",
+  email: "",
+  adresse: "",
+  localisation: "",
+});
+
+
+
+   {/* =====================  FILTER SELON LA RECHERCHE ===================== */}
 const filteredCleaners = cleaners.filter((c) =>
   Object.values(c).some((val) =>
     String(val).toLowerCase().includes(search.toLowerCase())
   )
 );
 
-// pagination
+
+const filteredPartenaires = partenaires.filter((p) =>
+  Object.values(p).some((val) =>
+    String(val).toLowerCase().includes(searchPartenaire.toLowerCase())
+  )
+);
+
+ {/* ===================== LA PAGINATION  CLEANERS ===================== */}
 const totalPages = Math.ceil(filteredCleaners.length / itemsPerPage);
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentCleaners = filteredCleaners.slice(indexOfFirst, indexOfLast);
-
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-  // ---------------- API STATS ----------------
+
+ {/* ===================== LA PAGINATION  PARTENAIRES ===================== */}
+const handlePageChanges = (pageNumber) => setCurrentPagePartenaire(pageNumber);
+const totalPagesPartenaire = Math.ceil(filteredPartenaires.length / itemsPerPage);
+const indexOfLasts = currentPagePartenaire * itemsPerPage;
+const indexOfFirsts = indexOfLasts - itemsPerPage;
+const currentPartenaires = filteredPartenaires.slice(indexOfFirsts, indexOfLasts);
+
+   {/* ===================== C'EST POUR API STATS ===================== */}
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -103,7 +136,7 @@ const totalPages = Math.ceil(filteredCleaners.length / itemsPerPage);
         <Spinner animation="border" />
       </div>
     );
-
+ {/* ===================== C'EST POUR LE DASHBOARD  ===================== */}
   const cards = [
     { title: "Visitors", value: stats.visitorsToday, icon: <FaUsers />, color: "#0d6efd" },
     { title: "Appointments", value: stats.appointments, icon: <FaCalendarCheck />, color: "#198754" },
@@ -127,9 +160,8 @@ const totalPages = Math.ceil(filteredCleaners.length / itemsPerPage);
   });
 /***************************************************************************** */
 
-// ---------------- EXPORT FUNCTIONS ----------------
 
-// ✅ Export Excel avec numérotation et exclusion de certaines colonnes
+ {/* ==========FONCTION POUR EXPORTER LE FICHIER EXCEL(EXCLURE ID ET LA DATE) ========= */}
 const exportToExcel = () => {
   const excludedColumns = ["id", "created_at"]; // colonnes à exclure
 
@@ -151,8 +183,8 @@ const exportToExcel = () => {
 }
 
 
-// ✅ Export PDF
-  const exportToPDF = async () => {
+ {/* ===================== FONCTION POUR EXPORTER PDF ===================== */}  
+ const exportToPDF = async () => {
     try {
       const response = await apiGet("/cleaner"); // Remplacez par votre endpoint
       const dataConsos = Array.isArray(response) ? response : response.data || [];
@@ -164,7 +196,7 @@ const exportToExcel = () => {
 
       const doc = new jsPDF();
 
-      // Logo facultatif
+ {/* ===================== LOGO DU PDF ===================== */} 
       const img = new Image();
       img.src = "/chec2.png"; 
       img.onload = () => generatePDF(doc, dataConsos, img);
@@ -174,7 +206,7 @@ const exportToExcel = () => {
       alert("Impossible de générer le PDF. Vérifiez la console.");
     }
   };
-
+ {/* ===================== FONCTION POUR GENERER PDF ===================== */}
  const generatePDF = (doc, dataCleaners, logo) => {
   if (logo) doc.addImage(logo, "PNG", 10, 5, 30, 30);
 
@@ -218,10 +250,8 @@ const exportToExcel = () => {
   doc.save("cleaners.pdf");
 };
 
+ {/* ===============CLEANER FUNCTIONS  LISTER TOUS LES CLEANERS  ============== */}
 
-
-
-// ---------------- CLEANER FUNCTIONS  Lister tous les cleaners----------------
    const fetchCleaners = async () => {
     try {
       const res = await axios.get("http://localhost:4000/api/cleaner", {
@@ -255,7 +285,8 @@ const exportToExcel = () => {
   const handleChange = (e) => {
     setNewCleaner({ ...newCleaner, [e.target.name]: e.target.value });
   };
-// ✅ Ajouter ou modifier un cleaner
+ {/* ===============CLEANER FUNCTIONS  AJOUT/MODIFIER  ============== */}
+
   const handleSaveCleaner = async () => {
     try {
       if (newCleaner.id) {
@@ -280,7 +311,7 @@ const exportToExcel = () => {
     setNewCleaner(u);
     setShowAddCleaner(true); // ✅ ouvrir la modale de formulaire
   };
-// ✅ Supprimer un cleaner
+ {/* ===============CLEANER FUNCTIONS  SUPPRIMER  ============== */}
   const handleDeleteCleaner = async (id) => {
      if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce cleaner ?")) {
     return; // l’utilisateur a annulé
@@ -295,6 +326,79 @@ const exportToExcel = () => {
     }
   };
 /***************************************************************************** */
+
+ {/* ===============PARTENAIRE FUNCTIONS  LISTER TOUS LES PARTENAIRES  ============== */}
+
+const fetchPartenaires = async () => {
+  try {
+    const res = await axios.get("http://localhost:4000/api/partenaire", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setPartenaires(res.data.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// Afficher la modale Partenaire
+const handleShowPartenaire = () => {
+  fetchPartenaires();
+  setShowPartenaire(true);
+};
+const handleClosePartenaire = () => setShowPartenaire(false);
+
+
+
+ {/* ===============PARTENAIRE FUNCTIONS  AJOUT/MODIFIER  ============== */}
+
+const handleSavePartenaire = async (e) => {
+  e.preventDefault(); // ✅ empêche le rechargement de la page
+  try {
+    if (newPartenaire.id) {
+      await axios.put(`http://localhost:4000/api/partenaire/${newPartenaire.id}`, newPartenaire, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } else {
+      await axios.post("http://localhost:4000/api/partenaire", newPartenaire, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
+    fetchPartenaires();
+    setShowAddPartenaire(false);
+    setNewPartenaire({
+      id: null,
+      nom_complet: "",
+      entreprise: "",
+      telephone: "",
+      email: "",
+      adresse: "",
+      localisation: "",
+    });
+  } catch (err) {
+ console.error("Erreur lors de l'enregistrement :", err.response?.data || err.message);  }
+};
+
+ {/* ===============PARTENAIRE FUNCTIONS   POUR MODIFIER  ============== */}
+
+const handleEditPartenaire = (p) => {
+  setNewPartenaire(p);
+  setShowAddPartenaire(true);
+};
+
+ {/* ===============PARTENAIRE FUNCTIONS   POUR SUPPRIMER  ============== */}
+
+const handleDeletePartenaire = async (id) => {
+  if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce partenaire ?")) return;
+  try {
+    await axios.delete(`http://localhost:4000/api/partenaire/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchPartenaires();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 return (
     <div className="p-3">
       {/* ===================== CARTES STATISTIQUES ===================== */}
@@ -387,27 +491,174 @@ return (
           )}
         </Card.Body>
       </Card>
-
+ {/****************************************************************************************************** */}
       {/* ===================== BOUTON CLEANERS ===================== */}
     
-   <Button onClick={handleShowCleaner}>Voir Cleaners</Button>
-  
-      {/* Liste des cleaners */}
-<Modal show={showCleaner} onHide={handleCloseCleaner} size="lg">
-  
-     
+ <div className="d-flex justify-content-between my-3">
+  <Button onClick={handleShowCleaner}>Voir Cleaners</Button>
+  <Button onClick={handleShowPartenaire}>Voir Partenaires</Button>
+</div>
+
+
+   {/* ===================== MODALE POUR LISTER DES PARTENAIRES ===================== */}
+
+  <Modal show={showPartenaire} onHide={handleClosePartenaire} size="lg">
   <Modal.Body>
+   <Row className="align-items-center mb-3">
+  {/* Bouton Ajouter Partenaire à gauche */}
+  <Col xs={12} md={4} className="mb-2 mb-md-0">
+    <Button onClick={() => setShowAddPartenaire(true)} className="w-100 w-md-auto">
+      Ajouter Partenaire
+    </Button>
+  </Col>
+
+  {/* Barre de recherche à droite */}
+  <Col xs={12} md={4} className="mb-2 mb-md-0 ms-auto">
+    <InputGroup style={{ maxWidth: "300px", width: "100%" }}>
+      <Form.Control
+        placeholder="Rechercher un partenaire..."
+        value={searchPartenaire}
+        onChange={(e) => {
+          setSearchPartenaire(e.target.value);
+          setCurrentPagePartenaire(1); // si tu as pagination
+        }}
+      />
+    </InputGroup>
+  </Col>
+</Row>
+
+
+    <Card className="shadow-sm mb-3">
+      <Card.Header className="d-flex justify-content-center align-items-center">
+        <span className="fw-bold fs-5">Liste des Partenaires</span>
+      </Card.Header>
+      <Card.Body>
+        <Table striped bordered hover responsive>
+          <thead>
+            <tr>
+              <th>Nom complet</th>
+              <th>Entreprise</th>
+              <th>Téléphone</th>
+              <th>Email</th>
+              <th>Adresse</th>
+              <th>Localisation</th>
+              <th colSpan={2}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentPartenaires.map((p) => (
+              <tr key={p.id}>
+                <td>{p.nom_complet}</td>
+                <td>{p.entreprise}</td>
+                <td>{p.telephone}</td>
+                <td>{p.email}</td>
+                <td>{p.adresse}</td>
+                <td>{p.localisation}</td>
+                <td>
+                  <FaEdit style={{ cursor: "pointer", color: "blue" }} onClick={() => handleEditPartenaire(p)} />
+                </td>
+                <td>
+                  <FaTrash style={{ cursor: "pointer", color: "red" }} onClick={() => handleDeletePartenaire(p.id)} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Card.Body>
+    </Card>
+     {/* ===================== PAGINATION ===================== */} 
+      {totalPagesPartenaire > 1 && (
+         <Pagination className="justify-content-center mt-3">
+           <Pagination.First onClick={() => handlePageChanges(1)} disabled={currentPagePartenaire === 1} />
+              <Pagination.Prev onClick={() => handlePageChanges(currentPagePartenaire - 1)} disabled={currentPagePartenaire === 1} />
+                {[...Array(totalPagesPartenaire)].map((_, idx) => (
+              <Pagination.Item key={idx + 1} active={idx + 1 === currentPagePartenaire} onClick={() => handlePageChanges(idx + 1)}>
+               {idx + 1}
+            </Pagination.Item>
+              ))}
+           <Pagination.Next onClick={() => handlePageChanges(currentPagePartenaire + 1)} disabled={currentPagePartenaire === totalPagesPartenaire} />
+          <Pagination.Last onClick={() => handlePageChanges(totalPagesPartenaire)} disabled={currentPagePartenaire === totalPagesPartenaire} />
+         </Pagination>
+        )}
+  </Modal.Body>
+</Modal>
+ {/* ===================== MODALE AJOUT /MODIFICATION PARTENAIRE ===================== */}
+
+<Modal show={showAddPartenaire} onHide={() => setShowAddPartenaire(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title>
+      {newPartenaire.id ? "Modifier Partenaire" : "Ajouter Partenaire"}
+    </Modal.Title>
+  </Modal.Header>
+  <Form onSubmit={handleSavePartenaire}>
+    <Modal.Body>
+      <Form.Control
+        className="mb-2"
+        name="nom_complet"
+        placeholder="Nom Complet"
+        value={newPartenaire.nom_complet}
+        onChange={(e) => setNewPartenaire({ ...newPartenaire, [e.target.name]: e.target.value })}
+        required
+      />
+      <Form.Control
+        className="mb-2"
+        name="entreprise"
+        placeholder="Entreprise"
+        value={newPartenaire.entreprise}
+        onChange={(e) => setNewPartenaire({ ...newPartenaire, [e.target.name]: e.target.value })}
+      />
+      <Form.Control
+        className="mb-2"
+        name="telephone"
+        placeholder="Téléphone"
+        value={newPartenaire.telephone}
+        onChange={(e) => setNewPartenaire({ ...newPartenaire, [e.target.name]: e.target.value })}
+      />
+      <Form.Control
+        className="mb-2"
+        name="email"
+        placeholder="Email"
+        value={newPartenaire.email}
+        onChange={(e) => setNewPartenaire({ ...newPartenaire, [e.target.name]: e.target.value })}
+      />
+      <Form.Control
+        className="mb-2"
+        name="adresse"
+        placeholder="Adresse"
+        value={newPartenaire.adresse}
+        onChange={(e) => setNewPartenaire({ ...newPartenaire, [e.target.name]: e.target.value })}
+      />
+      <Form.Control
+        className="mb-2"
+        name="localisation"
+        placeholder="Localisation"
+        value={newPartenaire.localisation}
+        onChange={(e) => setNewPartenaire({ ...newPartenaire, [e.target.name]: e.target.value })}
+      />
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={() => setShowAddPartenaire(false)}>Annuler</Button>
+      <Button variant="primary" type="submit">
+        {newPartenaire.id ? "Mettre à jour" : "Enregistrer"}
+      </Button>
+    </Modal.Footer>
+  </Form>
+</Modal>
+
+
+ {/* ===================== MODALE POUR LISTER DES CLEANERS ===================== */}   
+<Modal show={showCleaner} onHide={handleCloseCleaner} size="lg">
+ <Modal.Body>
  {/* Ligne de contrôle Cleaners */}
 <Row className="align-items-center mb-3">
-  {/* Bouton Ajouter Cleaner */}
-  <Col xs={12} md={4} className="mb-2 mb-md-0">
+ {/* ===================== BOUTON AJOUT CLEANER ===================== */}  
+ <Col xs={12} md={4} className="mb-2 mb-md-0">
     <Button onClick={handleShowAddCleaner} className="w-100 w-md-auto">
       Ajouter Cleaner
     </Button>
   </Col>
 
-  {/* Boutons Export */}
-  <Col xs={12} md={4} className="mb-2 mb-md-0 d-flex justify-content-md-center">
+ {/* ===================== CBOUTON EXPORT ===================== */}  <Col xs={12} md={4} className="mb-2 mb-md-0 d-flex justify-content-md-center">
     <Button variant="success" className="me-2" onClick={exportToExcel}>
       XLSX
     </Button>
@@ -416,8 +667,7 @@ return (
     </Button>
   </Col>
 
-  {/* Barre de recherche */}
-  <Col xs={12} md={4} className="d-flex justify-content-md-end">
+ {/* ===================== BARRE DE RECHERCHE ===================== */}  <Col xs={12} md={4} className="d-flex justify-content-md-end">
     <InputGroup style={{ maxWidth: "300px", width: "100%" }}>
       <Form.Control
         placeholder="Rechercher un cleaner..."
@@ -430,7 +680,7 @@ return (
     </InputGroup>
   </Col>
 </Row>
-
+ {/* ===================== TABLEAU POUR LISTE CLEANERS===================== */}
  <Card className="shadow-sm mb-3">
    <Card.Header className="d-flex justify-content-center align-items-center">
        <span className="fw-bold fs-5">Liste des Cleaners</span>
@@ -476,26 +726,25 @@ return (
  </Card>
   
 
-    {/* 🔄 Pagination */}
+ {/* ===================== PAGINATION ===================== */} 
     {totalPages > 1 && (
-                  <Pagination className="justify-content-center mt-3">
-                    <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
-                    <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                    {[...Array(totalPages)].map((_, idx) => (
-                      <Pagination.Item key={idx + 1} active={idx + 1 === currentPage} onClick={() => handlePageChange(idx + 1)}>
-                        {idx + 1}
-                      </Pagination.Item>
+         <Pagination className="justify-content-center mt-3">
+              <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
+                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                  {[...Array(totalPages)].map((_, idx) => (
+                   <Pagination.Item key={idx + 1} active={idx + 1 === currentPage} onClick={() => handlePageChange(idx + 1)}>
+                    {idx + 1}
+                    </Pagination.Item>
                     ))}
-                    <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                    <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
-                  </Pagination>
-                )}
-              
+                  <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+                <Pagination.Last onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages} />
+           </Pagination>
+        )}
+
   </Modal.Body>
 </Modal>
 
-
-      {/* Ajout / Modification cleaner */}
+ {/* ===================== AJOUT /MODIFICATION CLEANERS ===================== */}
    <Modal show={showAddCleaner} onHide={handleCloseAddCleaner}>
   <Modal.Header closeButton>
     <Modal.Title>
@@ -553,10 +802,9 @@ return (
         {newCleaner.id ? "Mettre à jour" : "Enregistrer"}
       </Button>
     </Modal.Footer>
-  </Form>
-</Modal>
-
-    </div>
+   </Form>
+  </Modal>
+ </div>
   );
 }
 

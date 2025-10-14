@@ -159,7 +159,7 @@ function App() {
 
       {/* Footer */}
       <footer className="text-center text-muted py-3 bg-white shadow-sm flex-shrink-0 w-100">
-        © {new Date().getFullYear()} Reception Dashboard - All Rights Reserved
+        © {new Date().getFullYear()} My Reception  - All Rights Reserved By YAYE FALL DEV
       </footer>
 
       {/* Modal Liste Users */}
