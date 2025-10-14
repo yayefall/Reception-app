@@ -164,14 +164,21 @@ function App() {
 
       {/* Modal Liste Users */}
       <Modal show={showUserListModal} onHide={() => setShowUserListModal(false)} size="lg" centered>
-        <Modal.Header>
-          <Modal.Title>Liste des utilisateurs</Modal.Title>
-          <Button variant="success" onClick={() => setShowAddUserModal(true)} style={{ marginLeft: "auto" }}>
+        <Modal.Body>
+        
+         <div className=" mb-3 ">
+
+          <Button variant="success" onClick={() => setShowAddUserModal(true)}  className="me-2">
             Ajouter un utilisateur
           </Button>
-        </Modal.Header>
-        <Modal.Body>
-          <Table striped bordered hover responsive>
+         </div>
+        
+           <Card className="shadow-lg mb-3">
+             <Card.Header className="d-flex justify-content-center align-items-center">
+                <span className="fw-bold fs-5">Liste des Utilisateurs</span>
+              </Card.Header>
+          <Card.Body>
+           <Table striped bordered hover responsive>
             <thead>
               <tr>
                 <th>Nom</th>
@@ -201,8 +208,11 @@ function App() {
                 </tr>
               ))}
             </tbody>
-          </Table>
-        </Modal.Body>
+           </Table>
+          </Card.Body>
+        </Card>
+
+       </Modal.Body>
       </Modal>
 
       {/* Modal Ajouter / Modifier User */}
