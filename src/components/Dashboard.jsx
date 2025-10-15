@@ -287,7 +287,8 @@ const exportToExcel = () => {
   };
  {/* ===============CLEANER FUNCTIONS  AJOUT/MODIFIER  ============== */}
 
-  const handleSaveCleaner = async () => {
+  const handleSaveCleaner = async (e) => {
+     e.preventDefault();
     try {
       if (newCleaner.id) {
         // update
@@ -302,6 +303,14 @@ const exportToExcel = () => {
       }
       fetchCleaners();
       handleCloseAddCleaner();
+      setNewCleaner({
+      id: null,
+      nomComplet: "",
+      fonction: "",
+      telephone: "",
+      lieu: "",
+      localisation: "",
+    });
     } catch (err) {
       console.error(err);
     }
